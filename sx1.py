@@ -1,45 +1,81 @@
 import streamlit as st
-
-st.title("学生 小铠——学生档案")
-st.header("🔑基础信息")
-st.markdown('学生ID：NEO-2023-001')
-st.markdown('注册时间: :green[2023-10-01 08:30:17]   | 精神状态:✅正常 ')
-st.markdown('当前教室: :green[实训楼301]   | 安全等级: :green[绝密] ')
-
-st.subheader('技能矩阵')
-c1, c2, c3 = st.columns(3)
-c1.metric(label="C语言", value="95%",delta="2%")
-c2.metric(label="python", value="87%", delta="-1%")
-c3.metric(label="java", value="1500", delta="-10%")
-
+import cloudinary
+import cloudinary.uploader
+import datetime
 import streamlit as st
-import time
-st.subheader(''' Streamlit课程进度''')
-st.progress(50,text='Streamlit课程进度')
-st.header(''' 📝任务日志''')
-import pandas as pd   
-import streamlit as st  
+# 页面配置
+st.set_page_config(page_title="简历生成器", layout="wide")
+st.title("📄个人简历生成器")
+c1, c2 = st.columns([1,2])
+with c1:
+    st.header("填写个人信息")
+    st.markdown(
+        """
+        <hr style="height:3px;border:none;background:linear-gradient(90deg, #1E90FF, #4169E1);border-radius:3px;margin:15px 0">
+        """,
+        unsafe_allow_html=True)
+    name = st.text_input("姓名", "")
+    job = st.text_input("职位", value="软件测试")
+    phone = st.text_input("电话", "")
+    email = st.text_input("邮箱", "")
+    birthday = st.date_input("出生日期")
+    gender = st.radio("性别", ["男", "女"])
+    edu = st.selectbox("学历", ["本科", "硕士", "博士", "其他"])
+    def my_format_func(option):
+        return f'{option}'
+    xueli = st.selectbox('学历:',['小学', '初中', '高中','本科','研究生','博士'],format_func=my_format_func, index=2)
 
-data={
-        '日期':['2025-06-01','2025-06-02','2023-06-03'],
-        '任务':['学生数字档案','课程管理系统','数据图表展示'],
-        '状态':['✅完成','�进行中','❌未完成'],
-        '难度':['★★☆☆☆','★☆☆☆☆','★★★☆☆'],
-}
-index = pd.Series(['0', '1', '2'], name='序号')
-df = pd.DataFrame(data, index=index)
-st.dataframe(df)
+    yuyan = st.multiselect('语言能力',
+        ['中文', '英语', '法语','日语','韩语','德语','葡萄牙语','西班牙语'],
+        format_func=my_format_func,)
+    
+    jineng = st.multiselect(
+        '技能(可多选)',
+        ['java', 'python', 'APS','机器学习','HTML/CSS','SQL','C','C++','C#'],
+        format_func=my_format_func,)
 
-st.header("💻 最新代码成果")
-# 创建要显示的Python代码块的内容
-python_code = '''def camera_process():
-    with TrtYOLO(lite):
-        trt.detect_when_openrtty()
-        expGoto()
-        return ACCESS_GRANTED
-    status, evade!")
-'''
-st.code(python_code)
+    from datetime import datetime, time
 
+    jingyan = st.slider('工作经验(年)', 0, 40, 0)
+    st.write("工作经验 ", jingyan, '年')
+    
+    values = st.slider(
+        '期望薪资(元)',
+        2000, 10000, (5000, 7000))
+    st.write("期望薪资 ", values, '元')
+    
+    grjl = st.text_area(label='个人简历：', placeholder='请简要介绍您的专业背景、职业目标和个人特点...')
+ 
+    time = st.number_input("每日最佳联系时间段")
+    st.write('最佳联系时间段为：', time)
 
-st.markdown(':green[`>>SYSTEM MESSAGE:`]下一个任务目标已解锁')
+    st.text('上传个人资料')
+    uploaded_file=st.file_uploader(
+        "上传个人照片",
+        type=['jpg','jpeg','png'])
+    with c2:
+        st.header('简历实时预览')
+        st.markdown(
+            """
+            <hr style="height:3px;border:none;background:linear-gradient(90deg, #1E90FF, #4169E1);border-radius:3px;margin:15px 0">
+            """,
+            unsafe_allow_html=True)
+        c3, c4 = st.columns(2)
+        with c3:
+            if uploaded_file:
+                st.image(uploaded_file)
+            st.write(f'职位:{job}')
+            st.write(f'电话:{phone}')
+            st.write(f'邮箱:{email}')
+            st.write(f'出生日期:{birthday}')
+        with c4:
+            st.write(f'性别:{gender}')
+            st.write(f'学历:{edu}')
+            st.write(f'工作经验:{jingyan}')
+            st.write(f'期望薪资:{jingyan}')
+            st.write(f'最佳联系时间:{time}')
+            st.write(f'语言能力:{yuyan}')
+        st.markdown('***')
+        st.write(f'个人简历:{grjl}')
+        st.markdown('***')
+    
